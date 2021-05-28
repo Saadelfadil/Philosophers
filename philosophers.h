@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 11:05:18 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/28 15:19:20 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/05/28 19:40:07 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,9 @@ typedef struct s_philo
     long    notepme;
 }s_philo;
 
+long	ft_atoi(const char *str);
+int     arguments_error();
+int     ft_strlen(char const *str);
+int     exit_error(char const *str);
 
 # endif
