@@ -6,17 +6,17 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/28 19:23:58 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/28 19:39:27 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/05/29 19:22:41 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "philosophers.h"
+#include "philosophers.h"
 
-long	ft_atoi(const char *str)
+long ft_atoi(const char *str)
 {
-    int		i;
-	int		sign;
-	long	res;
+	int i;
+	int sign;
+	long res;
 
 	i = 0;
 	res = 0;
@@ -41,25 +41,44 @@ long	ft_atoi(const char *str)
 	return (res * sign);
 }
 
-int     arguments_error()
+int arguments_error()
 {
 	printf("error: bad arguments\n");
 	return (-1);
 }
 
-int     exit_error(char const *str)
+int exit_error(char const *str)
 {
 	if (str)
 		write(1, str, ft_strlen(str));
 	return (1);
 }
 
-int     ft_strlen(char const *str)
+int ft_strlen(char const *str)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (str[i])
 		i++;
 	return (i);
+}
+
+void ft_putnbr_fd(int n, int fd)
+{
+	char str[13];
+	int length;
+
+	if (n == 0)
+		str[0] = '0';
+	length = 0;
+	while (n != 0)
+	{
+		str[length++] = '0' + (n % 10);
+		n = (n / 10);
+	}
+	if (length > 0)
+		length--;
+	while (length >= 0)
+		write(fd, &str[length--], 1);
 }
