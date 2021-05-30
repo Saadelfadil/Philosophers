@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/29 19:38:25 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/05/30 12:45:59 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,21 @@ void think_func(t_state *state, t_philo *philo)
 	pthread_mutex_unlock(&state->write_mutex);
 }
 
+void	take_forks(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->state->forks_mutex[philo->rfork]);
+	write(1, "Takes forks  ", 14);
+	ft_putnbr_fd(philo->id, 1);
+	write(1, "\n", 1);
+	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
+}
+
+void	drops_forks(t_philo *philo)
+{
+	pthread_mutex_unlock(&philo->state->forks_mutex[philo->rfork]);
+	pthread_mutex_unlock(&philo->state->forks_mutex[philo->lfork]);
+}
+
 void *myfunc(void *philo_)
 {
 	t_philo *philo;
@@ -29,9 +44,9 @@ void *myfunc(void *philo_)
 	while (1)
 	{
 		think_func(philo->state, philo);
-		// take_forks();
+		take_forks(philo);
 		// eat_func();
-		// drops_forks();
+		drops_forks(philo);
 		// sleep_func();
 	}
 	return NULL;
@@ -71,7 +86,6 @@ t_philo *init_philo(t_state *state)
 		philo[i].rfork = i;
 		philo[i].lfork = (i + 1) % state->num_of_philo;
 		philo[i].state = state;
-
 		i++;
 	}
 	return (philo);
