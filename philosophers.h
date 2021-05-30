@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 11:05:18 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/29 19:39:04 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/05/30 13:42:01 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #ifndef PHILOSOPHERS_H
 #define PHILOSOPHERS_H
