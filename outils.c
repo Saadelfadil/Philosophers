@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/28 19:23:58 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/29 19:22:41 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/05/31 14:37:22 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,4 +81,5 @@ void ft_putnbr_fd(int n, int fd)
 		length--;
 	while (length >= 0)
 		write(fd, &str[length--], 1);
+	write(fd, " ", 1);
 }
