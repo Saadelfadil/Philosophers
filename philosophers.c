@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/31 14:40:12 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/01 19:34:08 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void take_forks(t_state *state, t_philo *philo)
 	// printf("%lld %d Takes forks\n", (get_time_stamp()), philo->id);
 	ft_putnbr_fd((int)(get_time_stamp() / 1000), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, "Takes forks  ", 14);
+	write(1, "Take right fork", 15);
 	write(1, "\n", 1);
 	pthread_mutex_unlock(&state->write_mutex);
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
@@ -53,7 +53,7 @@ void take_forks(t_state *state, t_philo *philo)
 	// printf("%lld %d Takes forks\n", (get_time_stamp()), philo->id);
 	ft_putnbr_fd((int)(get_time_stamp() / 1000), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, "Takes forks  ", 14);
+	write(1, "Take left fork", 14);
 	write(1, "\n", 1);
 	pthread_mutex_unlock(&state->write_mutex);
 }
