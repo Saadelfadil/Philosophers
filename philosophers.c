@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/01 19:34:08 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/02 12:01:49 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ long long get_time_stamp()
 	struct timeval time;
 
 	gettimeofday(&time, NULL);
-	return ((time.tv_sec * 1000) + (time.tv_sec / 1000));
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
 void think_func(t_state *state, t_philo *philo)
@@ -77,12 +77,12 @@ void drops_forks(t_philo *philo)
 void sleep_func(t_state *state, t_philo *philo)
 {
 	long long start = get_time_stamp();
-	pthread_mutex_lock(&state->write_mutex);
+	// pthread_mutex_lock(&state->write_mutex);
 	// printf("%lld %d philosopher is sleeping\n", (get_time_stamp()), philo->id);
 	// write(1, "philosopher is sleeping ", 24);
 	// ft_putnbr_fd(philo->id, 1);
 	// write(1, "\n", 1);
-	pthread_mutex_unlock(&state->write_mutex);
+	// pthread_mutex_unlock(&state->write_mutex);
 	usleep(state->time_to_sleep * 1000 - 20000);
 	while (get_time_stamp() - start < state->time_to_sleep);
 }
@@ -111,8 +111,8 @@ void *myfunc(void *philo_)
 		think_func(philo->state, philo);
 		take_forks(philo->state, philo);
 		eat_func(philo->state, philo);
-		sleep_func(philo->state, philo);
 		drops_forks(philo);
+		sleep_func(philo->state, philo);
 	}
 	return NULL;
 }
