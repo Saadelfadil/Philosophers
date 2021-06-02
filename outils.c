@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/28 19:23:58 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/31 14:37:22 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/02 16:13:47 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,26 @@ int ft_strlen(char const *str)
 void ft_putnbr_fd(int n, int fd)
 {
 	char str[13];
+	int length;
+
+	if (n == 0)
+		str[0] = '0';
+	length = 0;
+	while (n != 0)
+	{
+		str[length++] = '0' + (n % 10);
+		n = (n / 10);
+	}
+	if (length > 0)
+		length--;
+	while (length >= 0)
+		write(fd, &str[length--], 1);
+	write(fd, " ", 1);
+}
+
+void ft_putlong_fd(long long n, int fd)
+{
+	char str[19];
 	int length;
 
 	if (n == 0)

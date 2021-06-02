@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 11:05:18 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/05/30 13:42:01 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/02 17:02:48 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,12 @@ typedef struct s_state
     long time_to_eat;
     long time_to_sleep;
     long notepme;
+    long long start;
 
     pthread_mutex_t write_mutex;
     pthread_mutex_t *forks_mutex;
+    pthread_mutex_t exit_mutex;
+
     struct s_philo *philo;
 
 } t_state;
@@ -38,8 +41,12 @@ typedef struct s_philo
     int id;
     int lfork;
     int rfork;
-    int last_time_eat;
+    long long last_time_eat;
+    long long limit;
+    int is_eating;
 
+    pthread_mutex_t mutex;
+    pthread_mutex_t eat_count;
     struct s_state *state;
 } t_philo;
 
@@ -47,6 +54,7 @@ long ft_atoi(const char *str);
 int arguments_error();
 int ft_strlen(char const *str);
 int exit_error(char const *str);
+void ft_putlong_fd(long long n, int fd);
 void ft_putnbr_fd(int n, int fd);
 
 #endif

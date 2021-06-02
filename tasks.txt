@@ -1,0 +1,3 @@
+free Malloc (free)
+free mutex (destroy)
+eat counter should fix ( create a thread)
