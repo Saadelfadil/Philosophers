@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.c                                     :+:      :+:    :+:   */
+/*   philo_three.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/05 19:52:20 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/07 12:07:12 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ void	think_func(t_state *state, t_philo *philo)
 
 void	take_forks(t_state *state, t_philo *philo)
 {
-	struct timeval	time;
-
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->rfork]);
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
 	pthread_mutex_lock(&state->write_mutex);
@@ -62,7 +60,7 @@ void	drops_forks(t_philo *philo)
 	pthread_mutex_unlock(&philo->state->forks_mutex[philo->lfork]);
 }
 
-void	sleep_func(t_state *state, t_philo *philo)
+void	sleep_func(t_state *state)
 {
 	// long long start = get_time_stamp();
 	usleep(state->time_to_sleep * 1000);
@@ -154,14 +152,13 @@ void	*myfunc(void *philo_)
 	philo->limit = philo->last_time_eat + philo->state->time_to_die;
 	philo->is_eating = 0;
 	pthread_create(&t_id, NULL, &supervisor, philo_);
-
 	while (1)
 	{
 		think_func(philo->state, philo);
 		take_forks(philo->state, philo);
 		eat_func(philo->state, philo);
 		drops_forks(philo);
-		sleep_func(philo->state, philo);
+		sleep_func(philo->state);
 	}
 	return (NULL);
 }
@@ -258,5 +255,6 @@ int	main(int argc, char *argv[])
 		init_state(&state, argv, argc);
 	if (start_threads(&state))
 		return (exit_error("error: in threads\n"));
+	while(1);
 	return (0);
 }

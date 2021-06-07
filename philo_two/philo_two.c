@@ -1,79 +1,71 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_one.c                                        :+:      :+:    :+:   */
+/*   philo_two.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/06 15:13:41 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/07 19:17:49 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-long long	get_time_stamp(void)
+long long get_time_stamp(void)
 {
-	struct timeval	time;
+	struct timeval time;
 
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void	think_func(t_state *state, t_philo *philo)
+void think_func(t_state *state, t_philo *philo)
 {
-	struct timeval	time;
-
-	gettimeofday(&time, NULL);
-	pthread_mutex_lock(&state->write_mutex);
+	sem_wait(state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
 	write(1, "THINKING   ", 9);
 	write(1, "\n", 1);
-	pthread_mutex_unlock(&state->write_mutex);
+	sem_post(state->write_mutex);
 }
 
-void	take_forks(t_state *state, t_philo *philo)
+void take_forks(t_state *state, t_philo *philo)
 {
-	pthread_mutex_lock(&philo->state->forks_mutex[philo->rfork]);
-	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
-	pthread_mutex_lock(&state->write_mutex);
+	sem_wait(state->forks_mutex);
+	sem_wait(state->forks_mutex);
+	sem_wait(state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
 	write(1, "Take forks", 11);
 	write(1, "\n", 1);
-	pthread_mutex_unlock(&state->write_mutex);
+	sem_post(state->write_mutex);
 }
 
-void	drops_forks(t_philo *philo)
+void drops_forks(t_philo *philo)
 {
-	struct timeval	time;
+	struct timeval time;
 
 	gettimeofday(&time, NULL);
-	pthread_mutex_lock(&philo->state->write_mutex);
+	sem_wait(philo->state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
 	write(1, "philosopher is sleeping ", 24);
 	write(1, "\n", 1);
-	pthread_mutex_unlock(&philo->state->write_mutex);
-	pthread_mutex_unlock(&philo->state->forks_mutex[philo->rfork]);
-	pthread_mutex_unlock(&philo->state->forks_mutex[philo->lfork]);
+	sem_post(philo->state->write_mutex);
+	sem_post(philo->state->forks_mutex);
+	sem_post(philo->state->forks_mutex);
 }
 
-void	sleep_func(t_state *state)
+void sleep_func(t_state *state)
 {
-	// long long start = get_time_stamp();
 	usleep(state->time_to_sleep * 1000);
-	// usleep(state->time_to_sleep * 1000 - 20000);
-	// while (get_time_stamp() - start < state->time_to_sleep)
-	// ;
 }
 
-void	eat_func(t_state *state, t_philo *philo)
+void eat_func(t_state *state, t_philo *philo)
 {
-	// long long start = get_time_stamp();
-	pthread_mutex_lock(&philo->mutex);
-	pthread_mutex_lock(&state->write_mutex);
+	sem_wait(philo->mutex);
+	sem_wait(state->write_mutex);
 	philo->last_time_eat = (get_time_stamp());
 	philo->limit = philo->last_time_eat + state->time_to_die;
 	philo->is_eating = 1;
@@ -81,46 +73,43 @@ void	eat_func(t_state *state, t_philo *philo)
 	ft_putnbr_fd(philo->id, 1);
 	write(1, "philosopher is eating ", 23);
 	write(1, "\n", 1);
-	pthread_mutex_unlock(&state->write_mutex);
-	pthread_mutex_unlock(&philo->mutex);
-	// usleep(state->time_to_eat * 1000 - 20000);
-	// while (get_time_stamp() - start < state->time_to_eat)
-	// 	;
+	sem_post(state->write_mutex);
+	sem_post(philo->mutex);
 	usleep(state->time_to_eat * 1000);
 	philo->is_eating = 0;
-	pthread_mutex_unlock(&philo->eat_count);
+	sem_post(philo->eat_count);
 }
 
-void	*supervisor(void *philo_)
+void *supervisor(void *philo_)
 {
-	t_philo	*philo;
+	t_philo *philo;
 
 	philo = (t_philo *)philo_;
 	while (1)
 	{
-		pthread_mutex_lock(&philo->mutex);
+		sem_wait(philo->mutex);
 		if (!philo->is_eating && get_time_stamp() > philo->limit)
 		{
-			pthread_mutex_lock(&philo->state->write_mutex);
+			sem_wait(philo->state->write_mutex);
 			ft_putlong_fd((get_time_stamp()), 1);
 			ft_putnbr_fd(philo->id, 1);
 			write(1, "philosopher is died", 19);
 			write(1, "\n", 1);
-			pthread_mutex_unlock(&philo->state->write_mutex);
-			pthread_mutex_unlock(&philo->mutex);
-			pthread_mutex_unlock(&philo->state->exit_mutex);
-			break ;
+			sem_post(philo->state->write_mutex);
+			sem_post(philo->mutex);
+			sem_post(philo->state->exit_mutex);
+			break;
 		}
-		pthread_mutex_unlock(&philo->mutex);
+		sem_post(philo->mutex);
 	}
 	return (NULL);
 }
 
-void	*eat_counter(void *state_)
+void *eat_counter(void *state_)
 {
-	t_state	*state;
-	int		i;
-	int		j;
+	t_state *state;
+	int i;
+	int j;
 
 	i = 0;
 	state = (t_state *)state_;
@@ -130,19 +119,18 @@ void	*eat_counter(void *state_)
 		j = 0;
 		while (j < state->num_of_philo)
 		{
-			pthread_mutex_lock(&philo[j].eat_count);
+			sem_wait(philo[j].eat_count);
 			j++;
 		}
-
 		i++;
 	}
-	pthread_mutex_lock(&state->write_mutex);
+	sem_wait(state->write_mutex);
 	printf("DONE\n");
-	pthread_mutex_unlock(&state->exit_mutex);
+	sem_post(state->exit_mutex);
 	return (NULL);
 }
 
-void	*myfunc(void *philo_)
+void *myfunc(void *philo_)
 {
 	t_philo *philo;
 	pthread_t t_id;
@@ -152,7 +140,6 @@ void	*myfunc(void *philo_)
 	philo->limit = philo->last_time_eat + philo->state->time_to_die;
 	philo->is_eating = 0;
 	pthread_create(&t_id, NULL, &supervisor, philo_);
-
 	while (1)
 	{
 		think_func(philo->state, philo);
@@ -164,7 +151,7 @@ void	*myfunc(void *philo_)
 	return (NULL);
 }
 
-int	start_threads(t_state *state)
+int start_threads(t_state *state)
 {
 	pthread_t t[state->num_of_philo];
 	pthread_t t_eat_count;
@@ -186,18 +173,11 @@ int	start_threads(t_state *state)
 		usleep(800);
 		i += 2;
 	}
-	// i = 0;
-	// while (i < state->num_of_philo)
-	// {
-	// 	pthread_join(t[i], NULL);
-	// 	i++;
-	// }
-	// exit(0);
-	pthread_mutex_lock(&state->exit_mutex);
+	sem_wait(state->exit_mutex);
 	return (0);
 }
 
-t_philo	*init_philo(t_state *state)
+t_philo *init_philo(t_state *state)
 {
 	t_philo *philo;
 	int i;
@@ -206,6 +186,8 @@ t_philo	*init_philo(t_state *state)
 	i = 0;
 	if (!philo)
 		return (NULL);
+	sem_unlink("mutex");
+	sem_unlink("eat_count");
 	while (i < state->num_of_philo)
 	{
 		philo[i].id = i + 1;
@@ -213,14 +195,14 @@ t_philo	*init_philo(t_state *state)
 		philo[i].lfork = i + 1;
 		philo[i].state = state;
 		philo[i].last_time_eat = (int)(get_time_stamp());
-		pthread_mutex_init(&philo[i].mutex, NULL);
-		pthread_mutex_init(&philo[i].eat_count, NULL);
+		philo[i].mutex = sem_open("mutex", O_CREAT | O_EXCL, 0666, 0);
+		philo[i].eat_count = sem_open("eat_count", O_CREAT | O_EXCL, 0666, 0);
 		i++;
 	}
 	return (philo);
 }
 
-int	init_state(t_state *state, char **argv, int argc)
+int init_state(t_state *state, char **argv, int argc)
 {
 	int i;
 
@@ -237,17 +219,19 @@ int	init_state(t_state *state, char **argv, int argc)
 		state->notepme = -1;
 	else if ((state->notepme = ft_atoi(argv[5])) == 0)
 		return (exit_error("error: bad arguments\n"));
-	state->forks_mutex = malloc(sizeof(pthread_mutex_t) * state->num_of_philo);
-	while (i < state->num_of_philo)
-		pthread_mutex_init(&state->forks_mutex[i++], NULL);
-	pthread_mutex_init(&state->write_mutex, NULL);
-	pthread_mutex_init(&state->exit_mutex, NULL);
-	pthread_mutex_lock(&state->exit_mutex);
+	// state->forks_mutex = malloc(sizeof(pthread_mutex_t) * state->num_of_philo);
+	// while (i < state->num_of_philo)
+	sem_unlink("mutex");
+	sem_unlink("write_mutex");
+	sem_unlink("exit_mutex");
+	state->forks_mutex = sem_open("mutex", O_CREAT | O_EXCL, 0666, state->num_of_philo);
+	state->write_mutex = sem_open("write_mutex", O_CREAT | O_EXCL, 0666, 1);
+	state->exit_mutex = sem_open("exit_mutex", O_CREAT | O_EXCL, 0666, 0);
 	state->philo = init_philo(state);
 	return (0);
 }
 
-int	main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	t_state state;
 	if (argc < 5 || argc > 6)
@@ -256,6 +240,5 @@ int	main(int argc, char *argv[])
 		init_state(&state, argv, argc);
 	if (start_threads(&state))
 		return (exit_error("error: in threads\n"));
-	while(1);
 	return (0);
 }
