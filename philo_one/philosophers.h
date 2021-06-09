@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 11:05:18 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/02 17:02:48 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/09 15:41:26 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,9 @@ typedef struct s_state
     long time_to_sleep;
     long notepme;
     long long start;
-
     pthread_mutex_t write_mutex;
     pthread_mutex_t *forks_mutex;
     pthread_mutex_t exit_mutex;
-
     struct s_philo *philo;
 
 } t_state;
@@ -44,7 +42,6 @@ typedef struct s_philo
     long long last_time_eat;
     long long limit;
     int is_eating;
-
     pthread_mutex_t mutex;
     pthread_mutex_t eat_count;
     struct s_state *state;
