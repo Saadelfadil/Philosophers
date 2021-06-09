@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/07 19:17:49 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/09 15:07:48 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void think_func(t_state *state, t_philo *philo)
 	sem_wait(state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, "THINKING   ", 9);
+	write(1, "THINKING   ", ft_strlen("THINKING   "));
 	write(1, "\n", 1);
 	sem_post(state->write_mutex);
 }
@@ -37,20 +37,17 @@ void take_forks(t_state *state, t_philo *philo)
 	sem_wait(state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, "Take forks", 11);
+	write(1, "Take forks", ft_strlen("Take forks"));
 	write(1, "\n", 1);
 	sem_post(state->write_mutex);
 }
 
 void drops_forks(t_philo *philo)
 {
-	struct timeval time;
-
-	gettimeofday(&time, NULL);
 	sem_wait(philo->state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, "philosopher is sleeping ", 24);
+	write(1, "philosopher is sleeping ", ft_strlen("philosopher is sleeping "));
 	write(1, "\n", 1);
 	sem_post(philo->state->write_mutex);
 	sem_post(philo->state->forks_mutex);
@@ -71,7 +68,7 @@ void eat_func(t_state *state, t_philo *philo)
 	philo->is_eating = 1;
 	ft_putlong_fd(philo->last_time_eat, 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, "philosopher is eating ", 23);
+	write(1, "philosopher is eating ", ft_strlen("philosopher is eating "));
 	write(1, "\n", 1);
 	sem_post(state->write_mutex);
 	sem_post(philo->mutex);
@@ -93,7 +90,7 @@ void *supervisor(void *philo_)
 			sem_wait(philo->state->write_mutex);
 			ft_putlong_fd((get_time_stamp()), 1);
 			ft_putnbr_fd(philo->id, 1);
-			write(1, "philosopher is died", 19);
+			write(1, "philosopher is died", ft_strlen("philosopher is died"));
 			write(1, "\n", 1);
 			sem_post(philo->state->write_mutex);
 			sem_post(philo->mutex);
@@ -195,8 +192,8 @@ t_philo *init_philo(t_state *state)
 		philo[i].lfork = i + 1;
 		philo[i].state = state;
 		philo[i].last_time_eat = (int)(get_time_stamp());
-		philo[i].mutex = sem_open("mutex", O_CREAT | O_EXCL, 0666, 0);
-		philo[i].eat_count = sem_open("eat_count", O_CREAT | O_EXCL, 0666, 0);
+		philo[i].mutex = sem_open("mutex", O_CREAT | O_EXCL, 0666, 1);
+		philo[i].eat_count = sem_open("eat_count", O_CREAT | O_EXCL, 0666, 1);
 		i++;
 	}
 	return (philo);
@@ -219,8 +216,6 @@ int init_state(t_state *state, char **argv, int argc)
 		state->notepme = -1;
 	else if ((state->notepme = ft_atoi(argv[5])) == 0)
 		return (exit_error("error: bad arguments\n"));
-	// state->forks_mutex = malloc(sizeof(pthread_mutex_t) * state->num_of_philo);
-	// while (i < state->num_of_philo)
 	sem_unlink("mutex");
 	sem_unlink("write_mutex");
 	sem_unlink("exit_mutex");
