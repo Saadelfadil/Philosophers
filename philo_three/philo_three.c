@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/09 20:05:47 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/12 16:11:48 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ void *supervisor(void *philo_)
 			ft_putnbr_fd(philo->id, 1);
 			write(1, "philosopher is died", ft_strlen("philosopher is died"));
 			write(1, "\n", 1);
+			exit(1);
 			sem_post(philo->state->write_mutex);
 			sem_post(philo->mutex);
 			sem_post(philo->state->exit_mutex);
@@ -111,36 +112,40 @@ void *eat_counter(void *state_)
 	i = 0;
 	state = (t_state *)state_;
 	t_philo *philo = state->philo;
-	while (i <= state->notepme)
+	while (i < state->notepme)
 	{
 		j = 0;
 		while (j < state->num_of_philo)
 		{
-			sem_wait(philo[j].eat_count);
+			sem_wait(philo[0].eat_count);
+			sem_wait(state->write_mutex);
+			printf("philo num:%d has eaten\n", j);
+			sem_post(state->write_mutex);
 			j++;
 		}
 		i++;
 	}
 	sem_wait(state->write_mutex);
 	printf("DONE\n");
-	sem_post(state->exit_mutex);
-	return (NULL);
+	i = 0;
+	while (state->pid[i])
+	{
+		kill(state->pid[i], SIGKILL);
+		i++;
+	}
+	exit(1);
 }
 
 void *myfunc(t_philo *philo)
 {
-	// t_philo *philo;
 	pthread_t t_id;
 
-	// philo = (t_philo *)philo_;
 	philo->last_time_eat = (long)get_time_stamp();
 	philo->limit = philo->last_time_eat + philo->state->time_to_die;
 	philo->is_eating = 0;
-	printf("CHILD \n");
-	// pthread_create(&t_id, NULL, &supervisor, philo);
+	pthread_create(&t_id, NULL, &supervisor, philo);
 	while (1)
 	{
-		printf("working\n");
 		think_func(philo->state, philo);
 		take_forks(philo->state, philo);
 		eat_func(philo->state, philo);
@@ -153,41 +158,40 @@ void *myfunc(t_philo *philo)
 int start_threads(t_state *state)
 {
 	// pthread_t t[state->num_of_philo];
-	// pthread_t t_eat_count;
+	pthread_t t_eat_count;
 	int i;
-	int pid;
+	int status;
+	state->pid  = malloc(sizeof(pid_t) * state->num_of_philo);
 
 	i = 0;
 	state->start = get_time_stamp();
-	// if (state->notepme != -1)
-	// 	pthread_create(&t_eat_count, NULL, &eat_counter, (void *)state);
+	if (state->notepme != -1)
+		pthread_create(&t_eat_count, NULL, &eat_counter, (void *)state);
 	while (i < state->num_of_philo)
 	{
-		pid = fork();
-		if (pid == 0)
+		state->philo->id = i + 1;
+		state->pid[i] = fork();
+		if (state->pid[i] == 0)
 			myfunc((void *)state->philo);
 		else
 			i++;
 		usleep(800);
 	}
-	wait(NULL);
-	// i = 0;
-	// while (i < state->num_of_philo)
-	// {
-	// 	wait(NULL);
-	// 	i += 1;
-	// }
-	// i = 0;
-	// while (i < state->num_of_philo)
-	// {
-	// 	pid = fork();
-	// 	printf("Iam here %d\n", pid);
-	// 	if (pid == 0)
-	// 		break;
-	// 		// myfunc((void *)state);
-	// 	usleep(800);
-	// 	i += 2;
-	// }
+	i = 0;
+	while (i < state->num_of_philo)
+	{
+		waitpid((pid_t)-1, &status, 0);
+		if (WIFEXITED(status) == 1)
+			break;
+		i += 1;
+	}
+	i = 0;
+	while (i < state->num_of_philo)
+	{
+		kill(state->pid[i], SIGKILL);
+		i++;
+	}
+	exit(0);
 	sem_wait(state->exit_mutex);
 	return (0);
 }
@@ -211,9 +215,9 @@ t_philo *init_philo(t_state *state)
 		philo[i].state = state;
 		philo[i].last_time_eat = (int)(get_time_stamp());
 		philo[i].mutex = sem_open("mutex", O_CREAT | O_EXCL, 0666, 1);
-		philo[i].eat_count = sem_open("eat_count", O_CREAT | O_EXCL, 0666, 1);
 		i++;
 	}
+	philo[0].eat_count = sem_open("eat_count", O_CREAT | O_EXCL, 0666, 0);
 	return (philo);
 }
 

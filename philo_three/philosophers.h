@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 11:05:18 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/07 18:51:14 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/12 16:10:49 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <semaphore.h>
+#include <signal.h>
 
 #ifndef PHILOSOPHERS_H
 #define PHILOSOPHERS_H
@@ -32,6 +33,7 @@ typedef struct s_state
 	sem_t	*forks_mutex;
 	sem_t	*exit_mutex;
 	struct s_philo *philo;
+	pid_t	*pid;
 } t_state;
 
 typedef struct s_philo
