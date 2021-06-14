@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/14 08:55:59 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/14 19:42:20 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,6 @@ void ft_sleep(long long ms)
 
 void think_func(t_state *state, t_philo *philo)
 {
-	// struct timeval	time;
-
-	// gettimeofday(&time, NULL);
-	// pthread_mutex_lock(&(state->write_mutex));
-	// ft_putlong_fd((get_time_stamp()), 1);
-	// ft_putlong_fd(philo->id, 1);
-	// write(1, "THINKING   ", 9);
-	// write(1, "\n", 1);
-	// pthread_mutex_unlock(&(state->write_mutex));
 	ft_logger(3, get_time_stamp(), philo->id, state);
 }
 
@@ -46,28 +37,11 @@ void take_forks(t_state *state, t_philo *philo)
 {
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->rfork]);
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
-	// pthread_mutex_lock(&(state->write_mutex));
-	// ft_putlong_fd((get_time_stamp()), 1);
-	// ft_putlong_fd(philo->id, 1);
-	// write(1, "Take forks", 11);
-	// write(1, "\n", 1);
-	// pthread_mutex_unlock(&(state->write_mutex));
 	ft_logger(4, get_time_stamp(), philo->id, state);
 }
 
 void drops_forks(t_philo *philo)
 {
-	// struct timeval	time;
-	// if (!philo->state->alive)
-	// 	return ;
-	// gettimeofday(&time, NULL);
-	// pthread_mutex_lock(&((philo->state->write_mutex)));
-	// printf("mutex sleeping %p\n", &philo->(state->write_mutex));
-	// ft_putlong_fd((get_time_stamp()), 1);
-	// ft_putlong_fd(philo->id, 1);
-	// write(1, "philosopher is sleeping ", 24);
-	// write(1, "\n", 1);
-	// pthread_mutex_unlock(&((philo->state->write_mutex)));
 	pthread_mutex_unlock(&philo->state->forks_mutex[philo->rfork]);
 	pthread_mutex_unlock(&philo->state->forks_mutex[philo->lfork]);
 }
@@ -82,18 +56,10 @@ void sleep_func(t_state *state)
 void eat_func(t_state *state, t_philo *philo)
 {
 	pthread_mutex_lock(&philo->mutex);
-	// pthread_mutex_lock(&(state->write_mutex));
-
-	// printf("mutex eating %p\n", &(state->write_mutex));
 	philo->last_time_eat = (get_time_stamp());
 	philo->limit = philo->last_time_eat + state->time_to_die;
 	philo->is_eating = 1;
 	ft_logger(1, get_time_stamp(), philo->id, state);
-	// ft_putlong_fd(philo->last_time_eat, 1);
-	// ft_putlong_fd(philo->id, 1);
-	// write(1, "philosopher is eating ", 23);
-	// write(1, "\n", 1);
-	// pthread_mutex_unlock(&(state->write_mutex));
 	pthread_mutex_unlock(&philo->mutex);
 	ft_sleep(state->time_to_eat);
 	philo->is_eating = 0;
