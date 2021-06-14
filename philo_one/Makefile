@@ -6,7 +6,7 @@
 #    By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/06/05 19:56:52 by sel-fadi          #+#    #+#              #
-#    Updated: 2021/06/06 15:10:23 by sel-fadi         ###   ########.fr        #
+#    Updated: 2021/06/13 20:31:18 by sel-fadi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ CC = gcc
 all: $(NAME)
 
 $(NAME):
-	@$(CC) $(FLAGS) $(SRC) -o $(NAME)
+	@$(CC) $(FLAGS) $(SRC) -o $(NAME) 
 
 fclean:
 	@rm -rf $(NAME)

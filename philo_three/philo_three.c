@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/12 18:17:56 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/13 15:56:33 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,6 @@ void *eat_counter(void *state_)
 		{
 			sem_wait(philo[0].eat_count);
 			sem_wait(state->write_mutex);
-			printf("philo num:%d has eaten\n", j);
 			sem_post(state->write_mutex);
 			j++;
 		}
@@ -154,11 +153,6 @@ void *myfunc(t_philo *philo)
 	}
 	return (NULL);
 }
-
-// void clear_leaks(t_state *state)
-// {
-	
-// }
 
 int start_threads(t_state *state)
 {
@@ -195,13 +189,9 @@ int start_threads(t_state *state)
 		kill(state->pid[i], SIGKILL);
 		i++;
 	}
-	// clear_leaks(state);
-	// free pid and philosophers
 	free(state->pid);
 	free(state->philo);
 	exit(0);
-	sem_wait(state->exit_mutex);
-	return (0);
 }
 
 t_philo *init_philo(t_state *state)
