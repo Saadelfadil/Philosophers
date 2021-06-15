@@ -6,54 +6,54 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/14 19:42:20 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/15 16:23:59 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-long long get_time_stamp(void)
+long long	get_time_stamp(void)
 {
-	struct timeval time;
+	struct timeval	time;
 
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void ft_sleep(long long ms)
+void	ft_sleep(long long ms)
 {
-	long long end = get_time_stamp() + ms;
+	long long	end;
 
+	end = get_time_stamp() + ms;
 	while (get_time_stamp() < end)
 		usleep(50);
 }
 
-void think_func(t_state *state, t_philo *philo)
+void	think_func(t_state *state, t_philo *philo)
 {
 	ft_logger(3, get_time_stamp(), philo->id, state);
 }
 
-void take_forks(t_state *state, t_philo *philo)
+void	take_forks(t_state *state, t_philo *philo)
 {
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->rfork]);
 	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
 	ft_logger(4, get_time_stamp(), philo->id, state);
 }
 
-void drops_forks(t_philo *philo)
+void	drops_forks(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->state->forks_mutex[philo->rfork]);
 	pthread_mutex_unlock(&philo->state->forks_mutex[philo->lfork]);
 }
 
-void sleep_func(t_state *state)
+void	sleep_func(t_state *state)
 {
-
 	ft_logger(2, get_time_stamp(), state->philo->id, state->philo->state);
 	ft_sleep(state->time_to_sleep);
 }
 
-void eat_func(t_state *state, t_philo *philo)
+void	eat_func(t_state *state, t_philo *philo)
 {
 	pthread_mutex_lock(&philo->mutex);
 	philo->last_time_eat = (get_time_stamp());
@@ -66,16 +66,18 @@ void eat_func(t_state *state, t_philo *philo)
 	pthread_mutex_unlock(&philo->eat_count);
 }
 
-void ft_putstr_fd(char *s, int i)
+void	ft_putstr_fd(char *s, int i)
 {
+	int	len;
+
 	i = 1;
-	int len = ft_strlen(s);
+	len = ft_strlen(s);
 	write(1, s, len);
 }
 
-void ft_logger(int status, long time, int id, t_state *state)
+void	ft_logger(int status, long time, int id, t_state *state)
 {
-	static int check;
+	static int	check;
 
 	pthread_mutex_lock(&(state->write_mutex));
 	if (!check)
@@ -100,9 +102,9 @@ void ft_logger(int status, long time, int id, t_state *state)
 	pthread_mutex_unlock(&(state->write_mutex));
 }
 
-void *supervisor(void *philo_)
+void	*supervisor(void *philo_)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)philo_;
 	while (philo->state->alive)
@@ -121,11 +123,11 @@ void *supervisor(void *philo_)
 	return (NULL);
 }
 
-void *eat_counter(void *state_)
+void	*eat_counter(void *state_)
 {
-	t_state *state;
-	int i;
-	int j;
+	t_state	*state;
+	int		i;
+	int		j;
 
 	i = 0;
 	state = (t_state *)state_;
@@ -146,7 +148,7 @@ void *eat_counter(void *state_)
 	return (NULL);
 }
 
-void *myfunc(void *philo_)
+void	*myfunc(void *philo_)
 {
 	t_philo *philo;
 	pthread_t t_id;
@@ -169,7 +171,7 @@ void *myfunc(void *philo_)
 	return (NULL);
 }
 
-int start_threads(t_state *state)
+int	start_threads(t_state *state)
 {
 	pthread_t t[state->num_of_philo];
 	pthread_t t_eat_count;
@@ -195,7 +197,7 @@ int start_threads(t_state *state)
 	return (0);
 }
 
-t_philo *init_philo(t_state *state)
+t_philo	*init_philo(t_state *state)
 {
 	t_philo *philo;
 	int i;
@@ -218,7 +220,7 @@ t_philo *init_philo(t_state *state)
 	return (philo);
 }
 
-int init_state(t_state *state, char **argv, int argc)
+int	init_state(t_state *state, char **argv, int argc)
 {
 	int i;
 
@@ -248,12 +250,12 @@ int init_state(t_state *state, char **argv, int argc)
 	return (0);
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
-	t_state state;
+	t_state	state;
 
 	if (argc < 5 || argc > 6)
-		return arguments_error();
+		return (arguments_error());
 	else
 		init_state(&state, argv, argc);
 	if (start_threads(&state))
