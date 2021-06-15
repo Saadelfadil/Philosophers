@@ -6,74 +6,11 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/15 16:23:59 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/15 19:11:46 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-long long	get_time_stamp(void)
-{
-	struct timeval	time;
-
-	gettimeofday(&time, NULL);
-	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
-}
-
-void	ft_sleep(long long ms)
-{
-	long long	end;
-
-	end = get_time_stamp() + ms;
-	while (get_time_stamp() < end)
-		usleep(50);
-}
-
-void	think_func(t_state *state, t_philo *philo)
-{
-	ft_logger(3, get_time_stamp(), philo->id, state);
-}
-
-void	take_forks(t_state *state, t_philo *philo)
-{
-	pthread_mutex_lock(&philo->state->forks_mutex[philo->rfork]);
-	pthread_mutex_lock(&philo->state->forks_mutex[philo->lfork]);
-	ft_logger(4, get_time_stamp(), philo->id, state);
-}
-
-void	drops_forks(t_philo *philo)
-{
-	pthread_mutex_unlock(&philo->state->forks_mutex[philo->rfork]);
-	pthread_mutex_unlock(&philo->state->forks_mutex[philo->lfork]);
-}
-
-void	sleep_func(t_state *state)
-{
-	ft_logger(2, get_time_stamp(), state->philo->id, state->philo->state);
-	ft_sleep(state->time_to_sleep);
-}
-
-void	eat_func(t_state *state, t_philo *philo)
-{
-	pthread_mutex_lock(&philo->mutex);
-	philo->last_time_eat = (get_time_stamp());
-	philo->limit = philo->last_time_eat + state->time_to_die;
-	philo->is_eating = 1;
-	ft_logger(1, get_time_stamp(), philo->id, state);
-	pthread_mutex_unlock(&philo->mutex);
-	ft_sleep(state->time_to_eat);
-	philo->is_eating = 0;
-	pthread_mutex_unlock(&philo->eat_count);
-}
-
-void	ft_putstr_fd(char *s, int i)
-{
-	int	len;
-
-	i = 1;
-	len = ft_strlen(s);
-	write(1, s, len);
-}
 
 void	ft_logger(int status, long time, int id, t_state *state)
 {
@@ -102,81 +39,13 @@ void	ft_logger(int status, long time, int id, t_state *state)
 	pthread_mutex_unlock(&(state->write_mutex));
 }
 
-void	*supervisor(void *philo_)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)philo_;
-	while (philo->state->alive)
-	{
-		pthread_mutex_lock(&philo->mutex);
-		if (!philo->is_eating && get_time_stamp() > philo->limit)
-		{
-			ft_logger(7, get_time_stamp(), philo->id, philo->state);
-			philo->state->alive = 0;
-			pthread_mutex_unlock(&philo->state->exit_mutex);
-			return (NULL);
-		}
-		pthread_mutex_unlock(&philo->mutex);
-		usleep(8000);
-	}
-	return (NULL);
-}
-
-void	*eat_counter(void *state_)
-{
-	t_state	*state;
-	int		i;
-	int		j;
-
-	i = 0;
-	state = (t_state *)state_;
-	t_philo *philo = state->philo;
-	while (i <= state->notepme)
-	{
-		j = 0;
-		while (j < state->num_of_philo)
-		{
-			pthread_mutex_lock(&philo[j].eat_count);
-			j++;
-		}
-		i++;
-	}
-	pthread_mutex_lock(&(state->write_mutex));
-	printf("DONE\n");
-	pthread_mutex_unlock(&state->exit_mutex);
-	return (NULL);
-}
-
-void	*myfunc(void *philo_)
-{
-	t_philo *philo;
-	pthread_t t_id;
-
-	philo = (t_philo *)philo_;
-	philo->last_time_eat = (long)get_time_stamp();
-	philo->limit = philo->last_time_eat + philo->state->time_to_die;
-	philo->is_eating = 0;
-	philo->state->alive = 1;
-	pthread_create(&t_id, NULL, &supervisor, philo_);
-
-	while (philo->state->alive)
-	{
-		think_func(philo->state, philo);
-		take_forks(philo->state, philo);
-		eat_func(philo->state, philo);
-		drops_forks(philo);
-		sleep_func(philo->state);
-	}
-	return (NULL);
-}
-
 int	start_threads(t_state *state)
 {
-	pthread_t t[state->num_of_philo];
-	pthread_t t_eat_count;
-	int i = 1;
+	pthread_t	t[state->num_of_philo];
+	pthread_t	t_eat_count;
+	int			i;
 
+	i = 1;
 	state->start = get_time_stamp();
 	if (state->notepme != -1)
 		pthread_create(&t_eat_count, NULL, &eat_counter, (void *)state);
@@ -199,8 +68,8 @@ int	start_threads(t_state *state)
 
 t_philo	*init_philo(t_state *state)
 {
-	t_philo *philo;
-	int i;
+	t_philo	*philo;
+	int		i;
 
 	philo = malloc(sizeof(t_philo) * state->num_of_philo);
 	i = 0;
@@ -222,7 +91,7 @@ t_philo	*init_philo(t_state *state)
 
 int	init_state(t_state *state, char **argv, int argc)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if ((state->num_of_philo = (int)ft_atoi(argv[1])) == 0)
