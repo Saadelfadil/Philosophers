@@ -6,13 +6,13 @@
 #    By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/06/05 19:56:52 by sel-fadi          #+#    #+#              #
-#    Updated: 2021/06/09 19:41:03 by sel-fadi         ###   ########.fr        #
+#    Updated: 2021/06/16 15:50:27 by sel-fadi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME=philo_three
+NAME=philo_bonus
 
-SRC = philo_three.c outils.c
+SRC = philo_bonus.c outils.c
 
 OBJ = $(SRC:.c=.o)
 

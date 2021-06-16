@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/15 19:04:32 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/15 19:12:56 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/16 15:36:30 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,19 @@ void	ft_putstr_fd(char *s, int i)
 	i = 1;
 	len = ft_strlen(s);
 	write(1, s, len);
+}
+
+int	ft_show_error(t_state *state, int argc)
+{
+	if (state->num_of_philo == 0)
+		return (exit_error("error: bad arguments\n"));
+	if (state->time_to_die == 0)
+		return (exit_error("error: bad arguments\n"));
+	if (state->time_to_eat == 0)
+		return (exit_error("error: bad arguments\n"));
+	if (state->time_to_sleep == 0)
+		return (exit_error("error: bad arguments\n"));
+	if (argc == 6 && state->notepme == 0)
+		return (exit_error("error: bad arguments\n"));
+	return (0);
 }

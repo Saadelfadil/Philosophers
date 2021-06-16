@@ -6,13 +6,13 @@
 #    By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/06/05 19:56:52 by sel-fadi          #+#    #+#              #
-#    Updated: 2021/06/07 11:28:01 by sel-fadi         ###   ########.fr        #
+#    Updated: 2021/06/16 15:38:09 by sel-fadi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME=philo_two
+NAME=philo
 
-SRC = philo_two.c outils.c
+SRC = philo.c outils.c outils_1.c life_circle.c supervisors.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -23,7 +23,7 @@ CC = gcc
 all: $(NAME)
 
 $(NAME):
-	@$(CC) $(FLAGS) $(SRC) -o $(NAME)
+	@$(CC) $(FLAGS) $(SRC) -o $(NAME) 
 
 fclean:
 	@rm -rf $(NAME)

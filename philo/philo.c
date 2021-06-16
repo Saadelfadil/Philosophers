@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 10:58:44 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/15 19:11:46 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/16 15:36:11 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,12 @@ void	ft_logger(int status, long time, int id, t_state *state)
 
 int	start_threads(t_state *state)
 {
-	pthread_t	t[state->num_of_philo];
+	pthread_t	*t;
 	pthread_t	t_eat_count;
 	int			i;
 
 	i = 1;
+	t = (pthread_t *)malloc(sizeof(pthread_t) * state->num_of_philo);
 	state->start = get_time_stamp();
 	if (state->notepme != -1)
 		pthread_create(&t_eat_count, NULL, &eat_counter, (void *)state);
@@ -78,8 +79,8 @@ t_philo	*init_philo(t_state *state)
 	while (i < state->num_of_philo)
 	{
 		philo[i].id = i + 1;
-		philo[i].rfork = ((i + 1) + 1) % state->num_of_philo;
-		philo[i].lfork = i + 1;
+		philo[i].rfork = (i + 1) % state->num_of_philo;
+		philo[i].lfork = i;
 		philo[i].state = state;
 		philo[i].last_time_eat = (int)(get_time_stamp());
 		pthread_mutex_init(&philo[i].mutex, NULL);
@@ -94,20 +95,15 @@ int	init_state(t_state *state, char **argv, int argc)
 	int	i;
 
 	i = 0;
-	if ((state->num_of_philo = (int)ft_atoi(argv[1])) == 0)
-		return (exit_error("error: bad arguments\n"));
-	// if (state->num_of_philo < 2)
-	// 	ft_logger(7, get_time_stamp(), state->philo->id, state->philo->state);
-	if ((state->time_to_die = ft_atoi(argv[2])) == 0)
-		return (exit_error("error: bad arguments\n"));
-	if ((state->time_to_eat = ft_atoi(argv[3])) == 0)
-		return (exit_error("error: bad arguments\n"));
-	if ((state->time_to_sleep = ft_atoi(argv[4])) == 0)
-		return (exit_error("error: bad arguments\n"));
+	state->num_of_philo = (int)ft_atoi(argv[1]);
+	state->time_to_die = ft_atoi(argv[2]);
+	state->time_to_eat = ft_atoi(argv[3]);
+	state->time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 5)
 		state->notepme = -1;
-	else if ((state->notepme = ft_atoi(argv[5])) == 0)
-		return (exit_error("error: bad arguments\n"));
+	else if (argc == 6)
+		state->notepme = ft_atoi(argv[5]);
+	ft_show_error(state, argc);
 	state->forks_mutex = malloc(sizeof(pthread_mutex_t) * state->num_of_philo);
 	while (i < state->num_of_philo)
 		pthread_mutex_init(&state->forks_mutex[i++], NULL);
