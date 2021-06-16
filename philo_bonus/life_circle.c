@@ -6,7 +6,7 @@
 /*   By: sel-fadi <sel-fadi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/16 16:49:04 by sel-fadi          #+#    #+#             */
-/*   Updated: 2021/06/16 17:13:37 by sel-fadi         ###   ########.fr       */
+/*   Updated: 2021/06/16 17:15:23 by sel-fadi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void	think_func(t_state *state, t_philo *philo)
 	sem_wait(state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, " \x1B[34mis thinking\x1B[0m", ft_strlen(" \x1B[34mis thinking\x1B[0m"));
+	write(1, " \x1B[34mis thinking\x1B[0m", \
+	ft_strlen(" \x1B[34mis thinking\x1B[0m"));
 	write(1, "\n", 1);
 	sem_post(state->write_mutex);
 }
@@ -29,7 +30,8 @@ void	take_forks(t_state *state, t_philo *philo)
 	sem_wait(state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, " \x1B[35mhas taken a fork\x1B[0m", ft_strlen(" \x1B[35mhas taken a fork\x1B[0m"));
+	write(1, " \x1B[35mhas taken a fork\x1B[0m", \
+	ft_strlen(" \x1B[35mhas taken a fork\x1B[0m"));
 	write(1, "\n", 1);
 	sem_post(state->write_mutex);
 }
@@ -39,7 +41,8 @@ void	drops_forks(t_philo *philo)
 	sem_wait(philo->state->write_mutex);
 	ft_putlong_fd((get_time_stamp()), 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, " \x1B[33mis sleeping\x1B[0m", ft_strlen(" \x1B[33mis sleeping\x1B[0m"));
+	write(1, " \x1B[33mis sleeping\x1B[0m", \
+	ft_strlen(" \x1B[33mis sleeping\x1B[0m"));
 	write(1, "\n", 1);
 	sem_post(philo->state->write_mutex);
 	sem_post(philo->state->forks_mutex);
@@ -60,7 +63,8 @@ void	eat_func(t_state *state, t_philo *philo)
 	philo->is_eating = 1;
 	ft_putlong_fd(philo->last_time_eat, 1);
 	ft_putnbr_fd(philo->id, 1);
-	write(1, " \x1B[32mis eating\x1B[0m", ft_strlen(" \x1B[32mis eating\x1B[0m"));
+	write(1, " \x1B[32mis eating\x1B[0m", \
+	ft_strlen(" \x1B[32mis eating\x1B[0m"));
 	write(1, "\n", 1);
 	sem_post(state->write_mutex);
 	sem_post(philo->mutex);
